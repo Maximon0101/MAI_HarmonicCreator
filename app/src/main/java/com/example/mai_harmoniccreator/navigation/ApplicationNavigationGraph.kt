@@ -27,12 +27,12 @@ fun ApplicationNavigationGraph (
                 typeOf<Double>() to navTypeOf<Double>(),
                 typeOf<Float>() to navTypeOf<Float>(),
             )
-        ) { SetupPage(viewModel) }
+        ) { SetupPage(navController, viewModel) }
         composable<DrawDestination>(
             typeMap = mapOf(
                 typeOf<Double>() to navTypeOf<Double>(),
                 typeOf<Float>() to navTypeOf<Float>(),
             )
-        ) { DrawPage() }
+        ) { DrawPage(navController, viewModel) }
     }
 }
