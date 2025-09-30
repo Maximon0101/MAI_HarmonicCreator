@@ -1,6 +1,9 @@
 package com.example.mai_harmoniccreator.data.physicalUnits
 
+import kotlinx.serialization.Serializable
+
 @JvmInline
+@Serializable
 value class Angle private constructor(
     private val value: Double // In radians
 ) {
@@ -32,3 +35,9 @@ val Double.rad
 
 val Double.deg
     get() = Angle.fromDegrees(this)
+
+val Int.rad
+    get() = this.toDouble().rad
+
+val Int.deg
+    get() = this.toDouble().deg

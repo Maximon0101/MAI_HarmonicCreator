@@ -1,8 +1,10 @@
 package com.example.mai_harmoniccreator.data.physicalUnits
 
+import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.seconds
 
 @JvmInline
+@Serializable
 value class Hertz(
     val value: Double
 ) {

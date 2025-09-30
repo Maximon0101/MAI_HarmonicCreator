@@ -1,6 +1,9 @@
 package com.example.mai_harmoniccreator.data.physicalUnits
 
+import kotlinx.serialization.Serializable
+
 @JvmInline
+@Serializable
 value class Volt(
     val value: Double
 ) {
