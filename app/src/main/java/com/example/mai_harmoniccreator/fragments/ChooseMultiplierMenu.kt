@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ChooseMultiplierMenu(currentAction: String, onMultiplierChange: (String) -> Unit){
+fun ChooseMultiplierMenu(currentAction: String, onMultiplierChange: (Double, String) -> Unit){
     Box(
         modifier = Modifier,
     ){
@@ -26,7 +26,7 @@ fun ChooseMultiplierMenu(currentAction: String, onMultiplierChange: (String) -> 
 }
 
 @Composable
-fun MinimalDropdownMenu(onMultiplierChange: (String) -> Unit) {
+fun MinimalDropdownMenu(onMultiplierChange: (Double, String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
 
 
@@ -43,25 +43,25 @@ fun MinimalDropdownMenu(onMultiplierChange: (String) -> Unit) {
             DropdownMenuItem(
                 text = { Text("milli") },
                 onClick = {
-                    onMultiplierChange("m")
+                    onMultiplierChange(0.001, "m")
                     expanded = false }
             )
             DropdownMenuItem(
                 text = { Text("1") },
                 onClick = {
-                    onMultiplierChange("1")
+                    onMultiplierChange(1.0, "1")
                     expanded = false }
             )
             DropdownMenuItem(
                 text = { Text("Kilo") },
                 onClick = {
-                    onMultiplierChange("k")
+                    onMultiplierChange(1000.0, "k")
                     expanded = false }
             )
             DropdownMenuItem(
                 text = { Text("Mega") },
                 onClick = {
-                    onMultiplierChange("M")
+                    onMultiplierChange(1000000.0, "M")
                     expanded = false }
             )
         }

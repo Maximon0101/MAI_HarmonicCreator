@@ -10,15 +10,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import kotlin.text.isEmpty
-import kotlin.text.toIntOrNull
 
 @Composable
 fun ValueInput(label: String, number: Double, onNumberChange: (Double) -> Unit) {
     val keyboardOption = remember { KeyboardOptions(keyboardType = KeyboardType.Number) }
-    var multiplierState by remember { mutableStateOf("1") }
+    var multiplierStateText by remember { mutableStateOf("1") }
+    var multiplierState by remember { mutableStateOf(1.0) }
 
-    fun changeMultiplierState(state: String) {
+    fun changeMultiplierState(state: Double, stateText: String) {
         multiplierState = state
+        multiplierStateText = stateText
     }
 
     Row(
@@ -26,18 +27,20 @@ fun ValueInput(label: String, number: Double, onNumberChange: (Double) -> Unit) 
         verticalAlignment = Alignment.CenterVertically,
     ) {
         OutlinedTextField(
-            value = number.toString(),
+            value = (number / multiplierState).toString(),
             onValueChange = { newText ->
                 if (newText.isEmpty()) {
                     onNumberChange(0.0)
                 }
                 val newNumber = newText.toDoubleOrNull() ?: return@OutlinedTextField // преобразуем строку в число
-                onNumberChange(newNumber)
+                onNumberChange(newNumber * multiplierState)
             },
             label = { Text(label) },
             keyboardOptions = keyboardOption
         )
-        ChooseMultiplierMenu(multiplierState, { changeMultiplierState(it) })
+        ChooseMultiplierMenu(multiplierStateText,
+            { state, stateText -> changeMultiplierState(state, stateText) }
+        )
     }
 
 }
