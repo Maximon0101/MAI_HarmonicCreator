@@ -27,8 +27,8 @@ class HarmonicViewModel(
 
     private val _harmonicSignalParametersFlow: MutableStateFlow<HarmonicSignalParameters> = MutableStateFlow(
         HarmonicSignalParameters(
-            amplitude = 10.v,
-            frequency = 50.hz,
+            amplitude = 0.v,
+            frequency = 0.hz,
             phase = 0.deg
         )
     )
@@ -65,6 +65,13 @@ class HarmonicViewModel(
 
     fun onShowSignal() {
         Log.i("APP", "onShowSignal")
+        if (_harmonicSignalParametersFlow.value.frequency.value == 0.0) {
+            viewModelScope.launch {
+                _events.emit(UiEvent.ShowZeroFrequencyError)
+            }
+            return
+        }
+
         viewModelScope.launch {
             _events.emit(UiEvent.Navigate(DrawDestination))
         }
@@ -169,4 +176,6 @@ class HarmonicViewModel(
 sealed class UiEvent {
     data class Navigate(val route: Any) : UiEvent()
     object PopBack : UiEvent()
+
+    object ShowZeroFrequencyError : UiEvent()
 }

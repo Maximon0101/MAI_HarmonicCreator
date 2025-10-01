@@ -1,10 +1,12 @@
 package com.example.mai_harmoniccreator.navigation
 
 import android.content.pm.ActivityInfo
+import android.widget.Toast
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,11 +24,20 @@ fun ApplicationNavigationGraph (
     navController: NavHostController,
     ) {
     val orientationConfiguration = LocalAndroidOrientation.current
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 is UiEvent.Navigate -> navController.navigate(event.route) { launchSingleTop = true }
                 is UiEvent.PopBack -> navController.popBackStack()
+                is UiEvent.ShowZeroFrequencyError -> {
+                    Toast.makeText(
+                        context,
+                        "Частота не может быть равна нулю",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
                 null -> {}
             }
         }
