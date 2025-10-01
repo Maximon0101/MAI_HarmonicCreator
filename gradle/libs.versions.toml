@@ -13,6 +13,7 @@ androidx-ui = "1.9.1"
 androidx-matetial3 = "1.5.0-alpha04"
 serialization = "1.7.3"
 material-icons-extended = "1.7.8"
+ycharts = "2.1.0"
 
 [libraries]
 androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
@@ -26,6 +27,7 @@ androidx-compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics", ver
 androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "androidx-matetial3" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "material-icons-extended" }
+ycharts = { group = "co.yml", name = "ycharts", version.ref = "ycharts" }
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

@@ -1,23 +1,41 @@
 package com.example.mai_harmoniccreator.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
+import co.yml.charts.common.model.Point
+import com.example.mai_harmoniccreator.data.GraphData
 import com.example.mai_harmoniccreator.data.HarmonicSignalParameters
 import com.example.mai_harmoniccreator.data.physicalUnits.deg
+import com.example.mai_harmoniccreator.data.physicalUnits.div
 import com.example.mai_harmoniccreator.data.physicalUnits.hz
 import com.example.mai_harmoniccreator.data.physicalUnits.rad
 import com.example.mai_harmoniccreator.data.physicalUnits.v
+import com.example.mai_harmoniccreator.navigation.DrawDestination
+import com.example.mai_harmoniccreator.navigation.SetupDestination
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
+import kotlin.math.sin
+import kotlin.time.times
 
-class HarmonicViewModel : ViewModel() {
+class HarmonicViewModel(
+    val navController: NavHostController
+) : ViewModel() {
+    private val _events = MutableSharedFlow<UiEvent>()
+    val events = _events.asSharedFlow()
+
     private val _harmonicSignalParametersFlow: MutableStateFlow<HarmonicSignalParameters> = MutableStateFlow(
         HarmonicSignalParameters(
-            amplitude = 0.v,
-            frequency = 0.hz,
+            amplitude = 10.v,
+            frequency = 50.hz,
             phase = 0.deg
         )
     )
-
     val harmonicSignalParametersFlow = _harmonicSignalParametersFlow
 
     fun updateAmplitude(newAmplitude: Double) {
@@ -44,4 +62,56 @@ class HarmonicViewModel : ViewModel() {
     fun updateHarmonicSignalParameters(newParameters: HarmonicSignalParameters) {
         _harmonicSignalParametersFlow.value = newParameters
     }
+
+    fun onShowSignal() {
+        Log.i("APP", "onShowSignal")
+        viewModelScope.launch {
+            _events.emit(UiEvent.Navigate(DrawDestination))
+        }
+        viewModelScope.launch(Dispatchers.Default) {
+            updateGraphData()
+        }
+    }
+
+    fun onBackToSetup() {
+        viewModelScope.launch {
+            _events.emit(UiEvent.PopBack)
+        }
+    }
+
+    private val _graphDataFlow: MutableStateFlow<GraphData?> = MutableStateFlow(
+        null
+    )
+
+    val graphDataFlow = _graphDataFlow
+
+    suspend fun updateGraphData() {
+        val parameters = _harmonicSignalParametersFlow.value
+        val samplesCount = 2000
+        val periodsCount = 10
+        val period = 1.0 / parameters.frequency
+        val totalPeriod = period * periodsCount
+        val sampleTime = totalPeriod / samplesCount
+
+        _graphDataFlow.emit(null)
+        val newPointsData: MutableList<Point> = mutableListOf(Point(0f, 0f))
+        for (i in 0..samplesCount) {
+            val x = (i * sampleTime).inWholeNanoseconds.toDouble().div(1e9)
+            val y = (parameters.amplitude.value) * sin(x * parameters.frequency.value + parameters.phase.inRadians)
+            newPointsData.addLast(Point(x.toFloat(), y.toFloat()))
+        }
+        val newGraphData = GraphData(
+            pointsData = newPointsData,
+            xAmplitude = (periodsCount * period).inWholeNanoseconds.toDouble().div(1e9),
+            yAmplitude = parameters.amplitude.value
+        )
+        Log.i("COUNTS", "$newGraphData")
+        _graphDataFlow.emit(newGraphData)
+    }
+}
+
+
+sealed class UiEvent {
+    data class Navigate(val route: Any) : UiEvent()
+    object PopBack : UiEvent()
 }

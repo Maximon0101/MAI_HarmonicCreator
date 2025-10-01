@@ -28,7 +28,6 @@ import com.example.mai_harmoniccreator.viewmodels.HarmonicViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetupPage(
-    navController: NavHostController,
     viewModel: HarmonicViewModel
 ) {
     val parameters by viewModel.harmonicSignalParametersFlow.collectAsState()
@@ -57,7 +56,7 @@ fun SetupPage(
                     onParametersChange = { viewModel.updateHarmonicSignalParameters(it) }
                 )
                 Button(
-                    onClick = {navController.navigate(route = DrawDestination)}
+                    onClick = { viewModel.onShowSignal() }
                 ) { Text("Сгенерировать") }
             }
         }

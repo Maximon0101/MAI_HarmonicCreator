@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 MAI_HarmonicCreatorTheme {
                     val navController = rememberNavController()
-                    val harmonicViewModel = viewModel<HarmonicViewModel> { HarmonicViewModel() }
+                    val harmonicViewModel = viewModel<HarmonicViewModel> { HarmonicViewModel(navController) }
                     ApplicationNavigationGraph(
                         viewModel = harmonicViewModel,
                         navController = navController,
