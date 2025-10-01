@@ -5,9 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import co.yml.charts.common.model.Point
 import com.example.mai_harmoniccreator.data.GraphData
 import com.example.mai_harmoniccreator.data.HarmonicSignalParameters
+import com.example.mai_harmoniccreator.data.Point
 import com.example.mai_harmoniccreator.data.physicalUnits.deg
 import com.example.mai_harmoniccreator.data.physicalUnits.div
 import com.example.mai_harmoniccreator.data.physicalUnits.hz
@@ -87,9 +87,9 @@ class HarmonicViewModel(
 
     suspend fun updateGraphData() {
         val parameters = _harmonicSignalParametersFlow.value
-        val samplesCount = 2000
-        val periodsCount = 10
-        val period = 1.0 / parameters.frequency
+        val samplesCount = 10000
+        val periodsCount = 5
+        val period = 2 * Math.PI / parameters.frequency
         val totalPeriod = period * periodsCount
         val sampleTime = totalPeriod / samplesCount
 

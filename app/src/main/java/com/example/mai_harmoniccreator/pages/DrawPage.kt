@@ -1,9 +1,14 @@
 package com.example.mai_harmoniccreator.pages
 
 import android.text.Layout
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
@@ -41,21 +47,44 @@ fun DrawPage(
             TopAppBar(title = { Text(text = "Сигнал") })
         },
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
+                .fillMaxSize()
+                .padding(16.dp), // Добавим общие отступы для контента
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column (
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (graphData == null) {LoadingIndicator()} else {
-                    Graph(graphData!!)
+            if (graphData == null) {
+                // Индикатор загрузки займет все доступное место до кнопки
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    LoadingIndicator()
                 }
-                TextButton (
-                    onClick = { viewModel.onBackToSetup() }
-                ) { Text("Вернуться") }
+            } else {
+                // Ряд для горизонтального размещения графиков
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp), // Расстояние между графиками
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val graphModifier = Modifier
+                        .weight(1f) // Занять половину ширины
+                        .fillMaxHeight() // Занять всю высоту, предоставленную Row
+                    // Левый график. Modifier.weight(1f) забирает половину ширины Row
+                    Graph(data = graphData!!, modifier = graphModifier)
+
+                    // Правый график. Также забирает половину ширины
+                    // ВАЖНО: Сейчас здесь используются те же данные, что и для левого графика
+                    Graph(data = graphData!!, modifier = graphModifier)
+                }
+            }
+
+            // Кнопка будет внизу, т.к. Row над ней имеет weight(1f)
+            TextButton(
+                onClick = { viewModel.onBackToSetup() }
+            ) {
+                Text("Вернуться")
             }
         }
     }

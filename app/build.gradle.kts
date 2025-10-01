@@ -51,7 +51,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.ycharts)
+    implementation(libs.mpandroidchart)
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
