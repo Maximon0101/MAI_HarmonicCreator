@@ -1,7 +1,6 @@
 package com.example.mai_harmoniccreator.viewmodels
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -14,7 +13,6 @@ import com.example.mai_harmoniccreator.data.physicalUnits.hz
 import com.example.mai_harmoniccreator.data.physicalUnits.rad
 import com.example.mai_harmoniccreator.data.physicalUnits.v
 import com.example.mai_harmoniccreator.navigation.DrawDestination
-import com.example.mai_harmoniccreator.navigation.SetupDestination
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +20,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlin.math.sin
 import kotlin.time.times
+import com.example.mai_harmoniccreator.utils.Complex
+import com.example.mai_harmoniccreator.utils.FFT
 
 class HarmonicViewModel(
     val navController: NavHostController
@@ -70,6 +70,7 @@ class HarmonicViewModel(
         }
         viewModelScope.launch(Dispatchers.Default) {
             updateGraphData()
+            updateSpectrumData()
         }
     }
 
@@ -95,7 +96,7 @@ class HarmonicViewModel(
 
         _graphDataFlow.emit(null)
         val newPointsData: MutableList<Point> = mutableListOf(Point(0f, 0f))
-        for (i in 0..samplesCount) {
+        for (i in 0 until samplesCount) {
             val x = (i * sampleTime).inWholeNanoseconds.toDouble().div(1e9)
             val y = (parameters.amplitude.value) * sin(x * parameters.frequency.value + parameters.phase.inRadians)
             newPointsData.addLast(Point(x.toFloat(), y.toFloat()))
@@ -108,7 +109,58 @@ class HarmonicViewModel(
         Log.i("COUNTS", "$newGraphData")
         _graphDataFlow.emit(newGraphData)
     }
+
+    private val _spectrumDataFlow: MutableStateFlow<GraphData?> = MutableStateFlow(
+        null
+    )
+    val spectrumDataFlow = _spectrumDataFlow
+
+    suspend fun updateSpectrumData() {
+
+        val parameters = _harmonicSignalParametersFlow.value
+        val samplesCount = 4096
+        val samplingFrequency = parameters.frequency.value * 10
+        val sampleTime = 1.0 / samplingFrequency
+
+        val timeSignal = Array(size = samplesCount) { 0.0 }
+        for (i in 0 until samplesCount) {
+            val t = i * sampleTime
+            timeSignal[i] = (parameters.amplitude.value) * sin(2 * Math.PI * parameters.frequency.value * t + parameters.phase.inRadians)
+        }
+
+        val complexSignal = Array(samplesCount) { i ->
+            Complex(timeSignal[i].toFloat(), 0f)
+        }
+
+        val spectrum = FFT.fft(complexSignal)
+
+        _spectrumDataFlow.emit(null)
+        val spectrumPoints = mutableListOf<Point>()
+        var maxAmplitude = 0f
+
+
+        for (k in 0 until samplesCount / 2) {
+            val frequency = k * samplingFrequency / samplesCount
+            val amplitude = (spectrum[k].abs() / samplesCount) * 2
+
+            if (amplitude > maxAmplitude) {
+                maxAmplitude = amplitude
+            }
+
+            spectrumPoints.add(Point(frequency.toFloat(), amplitude))
+        }
+
+        val newSpectrumData = GraphData(
+            pointsData = spectrumPoints,
+            xAmplitude = samplingFrequency / 2.0,
+            yAmplitude = maxAmplitude.toDouble()
+        )
+
+        Log.i("COUNTSSPECTRUM", "$newSpectrumData")
+        _spectrumDataFlow.emit(newSpectrumData)
+    }
 }
+
 
 
 sealed class UiEvent {

@@ -40,6 +40,7 @@ fun DrawPage(
     viewModel: HarmonicViewModel
 ) {
     val graphData by viewModel.graphDataFlow.collectAsState()
+    val spectrumData by viewModel.spectrumDataFlow.collectAsState()
 
     Scaffold (
         modifier = Modifier,
@@ -54,33 +55,35 @@ fun DrawPage(
                 .padding(16.dp), // Добавим общие отступы для контента
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (graphData == null) {
-                // Индикатор загрузки займет все доступное место до кнопки
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    LoadingIndicator()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(8.dp), // Расстояние между графиками
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val graphModifier = Modifier
+                    .weight(1f) // Занять половину ширины
+                    .fillMaxHeight() // Занять всю высоту, предоставленную Row
+                //Левый график - сигнал
+                if (graphData == null) {
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        LoadingIndicator()
+                    }
+                } else {
+                    Graph(data = graphData!!, modifier = graphModifier)
                 }
-            } else {
-                // Ряд для горизонтального размещения графиков
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp), // Расстояние между графиками
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val graphModifier = Modifier
-                        .weight(1f) // Занять половину ширины
-                        .fillMaxHeight() // Занять всю высоту, предоставленную Row
-                    // Левый график. Modifier.weight(1f) забирает половину ширины Row
-                    Graph(data = graphData!!, modifier = graphModifier)
 
-                    // Правый график. Также забирает половину ширины
-                    // ВАЖНО: Сейчас здесь используются те же данные, что и для левого графика
-                    Graph(data = graphData!!, modifier = graphModifier)
+                //Правый график - спектр
+                if (spectrumData == null) {
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        LoadingIndicator()
+                    }
+                } else {
+                    Graph(data = spectrumData!!, modifier = graphModifier)
                 }
             }
 
-            // Кнопка будет внизу, т.к. Row над ней имеет weight(1f)
             TextButton(
                 onClick = { viewModel.onBackToSetup() }
             ) {
