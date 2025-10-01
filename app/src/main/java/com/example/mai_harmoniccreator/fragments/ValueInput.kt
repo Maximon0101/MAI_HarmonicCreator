@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import kotlin.text.isEmpty
 
 @Composable
 fun ValueInput(label: String, number: Double, onNumberChange: (Double) -> Unit) {

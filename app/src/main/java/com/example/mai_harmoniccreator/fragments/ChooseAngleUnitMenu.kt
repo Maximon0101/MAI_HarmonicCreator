@@ -1,6 +1,5 @@
 package com.example.mai_harmoniccreator.fragments
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
@@ -9,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
 @Composable
 fun ChooseAngleUnitMenu(currentAction: String, onMultiplierChange: (Boolean, String) -> Unit){
@@ -41,13 +39,13 @@ fun MinimalDropdownMenuAngle(onMultiplierChange: (Boolean, String) -> Unit) {
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text("degrees") },
+                text = { Text("градусы") },
                 onClick = {
                     onMultiplierChange(true, "d")
                     expanded = false }
             )
             DropdownMenuItem(
-                text = { Text("radians (n of PI)") },
+                text = { Text("радианы (n of PI)") },
                 onClick = {
                     onMultiplierChange(false, "r")
                     expanded = false }

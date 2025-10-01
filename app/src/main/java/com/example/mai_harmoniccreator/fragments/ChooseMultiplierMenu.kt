@@ -1,6 +1,5 @@
 package com.example.mai_harmoniccreator.fragments
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
@@ -9,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
 @Composable
 fun ChooseMultiplierMenu(currentAction: String, onMultiplierChange: (Double, String) -> Unit){
@@ -41,7 +39,7 @@ fun MinimalDropdownMenu(onMultiplierChange: (Double, String) -> Unit) {
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text("milli") },
+                text = { Text("мили") },
                 onClick = {
                     onMultiplierChange(0.001, "m")
                     expanded = false }
@@ -53,13 +51,13 @@ fun MinimalDropdownMenu(onMultiplierChange: (Double, String) -> Unit) {
                     expanded = false }
             )
             DropdownMenuItem(
-                text = { Text("Kilo") },
+                text = { Text("Кило") },
                 onClick = {
                     onMultiplierChange(1000.0, "k")
                     expanded = false }
             )
             DropdownMenuItem(
-                text = { Text("Mega") },
+                text = { Text("Мега") },
                 onClick = {
                     onMultiplierChange(1000000.0, "M")
                     expanded = false }

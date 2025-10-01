@@ -1,7 +1,6 @@
 package com.example.mai_harmoniccreator.navigation
 
 import android.content.pm.ActivityInfo
-import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable

@@ -7,12 +7,10 @@ import androidx.navigation.NavHostController
 import com.example.mai_harmoniccreator.data.GraphData
 import com.example.mai_harmoniccreator.data.HarmonicSignalParameters
 import com.example.mai_harmoniccreator.data.Point
-import com.example.mai_harmoniccreator.data.physicalUnits.deg
-import com.example.mai_harmoniccreator.data.physicalUnits.div
-import com.example.mai_harmoniccreator.data.physicalUnits.hz
-import com.example.mai_harmoniccreator.data.physicalUnits.rad
-import com.example.mai_harmoniccreator.data.physicalUnits.v
+import com.example.mai_harmoniccreator.data.physicalUnits.*
 import com.example.mai_harmoniccreator.navigation.DrawDestination
+import com.example.mai_harmoniccreator.utils.Complex
+import com.example.mai_harmoniccreator.utils.FFT
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,8 +18,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlin.math.sin
 import kotlin.time.times
-import com.example.mai_harmoniccreator.utils.Complex
-import com.example.mai_harmoniccreator.utils.FFT
 
 class HarmonicViewModel(
     val navController: NavHostController
@@ -54,7 +50,11 @@ class HarmonicViewModel(
 
     fun updatePhase(newPhase: Double, isDegrees: Boolean) {
         val newHarmonicSignalParameters = _harmonicSignalParametersFlow.value.copy(
-            phase = if (isDegrees) {newPhase.deg} else {newPhase.rad}
+            phase = if (isDegrees) {
+                newPhase.deg
+            } else {
+                newPhase.rad
+            }
         )
         _harmonicSignalParametersFlow.value = newHarmonicSignalParameters
     }
@@ -88,19 +88,22 @@ class HarmonicViewModel(
 
     suspend fun updateGraphData() {
         val parameters = _harmonicSignalParametersFlow.value
-        val samplesCount = 10000
-        val periodsCount = 5
-        val period = 2 * Math.PI / parameters.frequency
-        val totalPeriod = period * periodsCount
-        val sampleTime = totalPeriod / samplesCount
+
+        val samplesCount = 10000    // Количество точек на графике
+        val periodsCount = 5    // Количество периодов сигнала, которые нужно отобразить
+        val period = 2 * Math.PI / parameters.frequency     // Период сигнала в секундах
+        val totalPeriod = period * periodsCount     // Общее время отображаемого сигнала
+        val sampleTime = totalPeriod / samplesCount     // Время между точками на графике
 
         _graphDataFlow.emit(null)
         val newPointsData: MutableList<Point> = mutableListOf(Point(0f, 0f))
+
         for (i in 0 until samplesCount) {
             val x = (i * sampleTime).inWholeNanoseconds.toDouble().div(1e9)
             val y = (parameters.amplitude.value) * sin(x * parameters.frequency.value + parameters.phase.inRadians)
             newPointsData.addLast(Point(x.toFloat(), y.toFloat()))
         }
+
         val newGraphData = GraphData(
             pointsData = newPointsData,
             xAmplitude = (periodsCount * period).inWholeNanoseconds.toDouble().div(1e9),
@@ -116,17 +119,18 @@ class HarmonicViewModel(
     val spectrumDataFlow = _spectrumDataFlow
 
     suspend fun updateSpectrumData() {
-
         val parameters = _harmonicSignalParametersFlow.value
-        val samplesCount = 4096
-        val samplingFrequency = parameters.frequency.value * 10
-        val sampleTime = 1.0 / samplingFrequency
 
-        val timeSignal = Array(size = samplesCount) { 0.0 }
+        val samplesCount = 4096     // Количество точек для БПФ, должно быть степенью двойки
+        val samplingFrequency = parameters.frequency.value * 10     // Частота дискретизации
+        val sampleTime = 1.0 / samplingFrequency    // Время между точками дискретизации
+        val timeSignal = Array(size = samplesCount) { 0.0 }     // Массив для хранения отсчетов сигнала во времени
+
         for (i in 0 until samplesCount) {
             val t = i * sampleTime
-            timeSignal[i] = (parameters.amplitude.value) * sin(2 * Math.PI * parameters.frequency.value * t + parameters.phase.inRadians)
-        }
+            timeSignal[i] =
+                (parameters.amplitude.value) * sin(2 * Math.PI * parameters.frequency.value * t + parameters.phase.inRadians)
+        }   // Заполняем массив отсчетов сигнала
 
         val complexSignal = Array(samplesCount) { i ->
             Complex(timeSignal[i].toFloat(), 0f)
@@ -160,7 +164,6 @@ class HarmonicViewModel(
         _spectrumDataFlow.emit(newSpectrumData)
     }
 }
-
 
 
 sealed class UiEvent {
