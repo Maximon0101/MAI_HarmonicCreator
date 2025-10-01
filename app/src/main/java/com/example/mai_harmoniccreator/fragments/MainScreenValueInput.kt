@@ -24,7 +24,7 @@ fun MainScreenValueInput(parameters: HarmonicSignalParameters, onParametersChang
             parameters.frequency.value,
             { onParametersChange(parameters.copy(frequency = it.hz)) }
         )
-        ValueInput(
+        PhaseValueInput(
             "Фаза",
             parameters.phase.inDegrees,
             { onParametersChange(parameters.copy(phase = it.deg)) }
